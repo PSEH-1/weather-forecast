@@ -25,7 +25,8 @@ public class WeatherController {
     @ResponseBody
 
     public ResponseEntity<String> forecast(@RequestParam String city) throws JSONException, IOException {
-        String url = "http://api.openweathermap.org/data/2.5/forecast?q="+city+",us&mode=json&appid=d2929e9483efc82c82c32ee7e02d563e";
+        String url = "http://api.openweathermap.org/data/2.5/forecast?q="+city+
+                ",us&mode=json&appid=d2929e9483efc82c82c32ee7e02d563e";
         RestTemplate restTemplate = new RestTemplate();
         String result = restTemplate.getForObject(url, String.class);
         JSONObject returnJSON = new JSONObject();
@@ -34,11 +35,10 @@ public class WeatherController {
         final List<Map<String,Object>> weatherList = (List<Map<String, Object>>) resultMap.get("list");
         Date today = new Date();
         LocalDate referenceDate = today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        //LocalDate referenceDate = LocalDate.parse("1970-01-18");
-        //Days.daysBetween(start, end).getDays()
+
         weatherList.stream().filter(stringObjectMap -> {
             LocalDate listDate = LocalDate.parse(StringUtils.substringBefore((String)stringObjectMap.get("dt_txt")," "));//Instant.ofEpochMilli(longDate).atZone(ZoneId.of("UTC")).toLocalDate();
-            if(Long.valueOf(ChronoUnit.DAYS.between(referenceDate,listDate)).compareTo(Long.valueOf(3)) < 0){
+            if(!listDate.toString().equals(referenceDate.toString()) && Long.valueOf(ChronoUnit.DAYS.between(referenceDate,listDate)).compareTo(Long.valueOf(4)) < 0){
                 return true;
             } else {
                 return false;
